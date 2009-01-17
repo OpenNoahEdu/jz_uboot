@@ -1,0 +1,25 @@
+2008.05.30:
+
+* Add Jz4725 DIPPER Board Support
+	
+2008.05.05:
+
+* Added FOXCONN_PT035TN01 LCD panel support for PAVO board. <zyliu@ingenic.cn>
+
+2008.04.26:
+
+* Patch jz4740_nand.c to optimize the RS correction algorithm. <zengzhaoxiu>
+
+2008.04.11:
+
+* nand_spl/nand_boot_jz4740.c: fixed a fatal bug of nand_load(), which will
+  fail to load u-boot when meeting a bad block. <zyliu@ingenic.cn>
+
+2008.03.19:
+
+* Modified nand read/write/erase commands in common/cmd_nand.c
+  to support bad blocks checking. <zyliu@ingenic.cn>
+
+2008.02.26:
+
+* Release for JZ4740 and JZ4730.
