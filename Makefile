@@ -2125,6 +2125,13 @@ pavo_config		: 	unconfig
 	@echo "#define CONFIG_PAVO 1" >>include/config.h
 	@./mkconfig -a pavo mips mips pavo
 
+ondavx747_nand_config		: 	unconfig
+	@echo "#define CONFIG_NAND_U_BOOT" > $(obj)include/config.h
+	@echo "Compile NAND boot image for onda vx747"
+	@./mkconfig -a ondavx747 mips mips ondavx747
+	@echo "TEXT_BASE = 0x80100000" > $(obj)board/pavo/config.tmp
+	@echo "CONFIG_NAND_U_BOOT = y" >> $(obj)include/config.mk
+	
 pavo_nand_config	:	unconfig
 	@echo "#define CONFIG_NAND_U_BOOT" > $(obj)include/config.h
 	@echo "Compile NAND boot image for pavo"
