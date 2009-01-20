@@ -29,7 +29,7 @@ tools/gen_eth_addr
 tools/img2srec
 tools/inca-swap-bytes
 tools/mkimage
-
-
+u-boot-spl
+*.tmp
 
 
