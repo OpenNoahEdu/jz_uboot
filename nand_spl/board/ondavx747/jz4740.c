@@ -1,0 +1,1 @@
+/home/root/sdd/onda/jz_uboot/cpu/mips/jz4740.c

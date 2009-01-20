@@ -10,7 +10,6 @@ CVS
 u-boot
 *.bin
 *.map
-nand_spl
 *.a
 *.depend
 *.asm

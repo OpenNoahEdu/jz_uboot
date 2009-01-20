@@ -1,0 +1,1 @@
+/home/root/sdd/onda/jz_uboot/nand_spl/nand_boot_jz4740.c
