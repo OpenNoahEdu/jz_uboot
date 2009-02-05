@@ -31,9 +31,11 @@
 #define CONFIG_JZ4740		1  /* Jz4740 SoC */
 #define CONFIG_ONDAVX747		1  /* PAVO validation board */
 
-//#define CONFIG_LCD                 /* LCD support */
-#define CONFIG_JZLCD_SAMSUNG_LTP400WQF02_18BIT
-#define LCD_BPP			5  /* 5: 18,24,32 bits per pixel */
+#define CONFIG_LCD        /*SLCD Support*/
+
+#define CONFIG_JZSLCD
+#define CONFIG_JZSLCD_TFT_G240400RTSW_3WTP_E
+#define LCD_BPP			4  /* 4: 16 bits per pixel */
 #define CFG_WHITE_ON_BLACK
 #define CONFIG_LCD_LOGO
 

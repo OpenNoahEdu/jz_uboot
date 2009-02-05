@@ -295,7 +295,11 @@ static void lcd_drawchars (ushort x, ushort y, uchar *str, int count)
 		*d  = rest | (*d & ((1 << (8-off)) - 1));
 #endif
 	}
-
+	
+#ifdef CONFIG_JZSLCD
+	lcd_set_target(0,0,panel_info.vl_col,panel_info.vl_row);
+	jz_slcd_update();
+#endif
 #ifdef CONFIG_JzRISC		  /* JzRISC core */ 
 	flush_cache_all();
 #endif

@@ -166,6 +166,7 @@ struct jz_fb_dma_descriptor {
 	u_long	ldcmd;		/* Command register */
 };
 
+
 /*
  * Jz LCD info
  */
@@ -178,18 +179,19 @@ struct jz_fb_info {
 	struct	jz_fb_dma_descriptor *	dmadesc_fblow;
 	struct	jz_fb_dma_descriptor *	dmadesc_fbhigh;
 	struct	jz_fb_dma_descriptor *	dmadesc_palette;
-
+	
 	u_long	screen;		/* address of frame buffer */
 	u_long	palette;	/* address of palette memory */
 	u_int	palette_size;
 };
+
 typedef struct vidinfo {
 	ushort	vl_col;		/* Number of columns (i.e. 640) */
 	ushort	vl_row;		/* Number of rows (i.e. 480) */
 	u_char	vl_bpix;	/* Bits per pixel, 0 = 1, 1 = 2, 2 = 4, 3 = 8 */
-
-	struct jz_fb_info jz_fb;
 } vidinfo_t;
+
+
 
 extern vidinfo_t panel_info;
 #endif /* CONFIG_MPC823, CONFIG_PXA250, CONFIG_MCC200 or CONFIG_JZ4730 */
