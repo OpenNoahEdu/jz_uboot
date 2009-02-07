@@ -19,6 +19,9 @@
  * MA 02111-1307 USA
  */
 
+/*Most of these code is from rockbox.*/
+
+
 #include <config.h>
 #include <common.h>
 #include <devices.h>
@@ -246,6 +249,36 @@ void lcd_set_target(short x, short y, short width, short height)
     SLCD_SET_COMMAND(REG_RW_GRAM);      /* write data to GRAM */
 }
 
+static void __slcd_display_on(void)
+{
+    int i;
+    SLCD_SEND_COMMAND(REG_PWR_CTRL1,
+                      (PWR_CTRL1_SAPE | PWR_CTRL1_BT(6) | PWR_CTRL1_APE |
+                       PWR_CTRL1_AP(3)));
+    mdelay(5);
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
+                                       | DISP_CTRL1_D(1)));
+    mdelay(5);
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
+                                       | DISP_CTRL1_DTE | DISP_CTRL1_D(3)
+                                       | DISP_CTRL1_BASEE));
+}
+static void __slcd_display_off(void)
+{
+    int i;
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
+                                       | DISP_CTRL1_DTE | DISP_CTRL1_D(2)));
+    mdelay(5);
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, DISP_CTRL1_D(1));
+    mdelay(5);
+    SLCD_SEND_COMMAND(REG_DISP_CTRL1, DISP_CTRL1_D(0));
+    mdelay(5);
+    SLCD_SEND_COMMAND(REG_PWR_CTRL1, PWR_CTRL1_SLP);
+}
+
+/************JZ SLCD DMA Stuff***********************/
+
+
 /*SLCD DMA descriptor*/
 struct jz_dma_desc
 {
@@ -322,32 +355,16 @@ static void jz_slcd_desc_init(void *lcdbase, vidinfo_t * vid)
 
 }
 
-static void __slcd_display_on(void)
+void lcd_enable(void)
 {
-    int i;
-    SLCD_SEND_COMMAND(REG_PWR_CTRL1,
-                      (PWR_CTRL1_SAPE | PWR_CTRL1_BT(6) | PWR_CTRL1_APE |
-                       PWR_CTRL1_AP(3)));
-    mdelay(5);
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
-                                       | DISP_CTRL1_D(1)));
-    mdelay(5);
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
-                                       | DISP_CTRL1_DTE | DISP_CTRL1_D(3)
-                                       | DISP_CTRL1_BASEE));
+    __slcd_display_on();
 }
-static void __slcd_display_off(void)
+
+void lcd_disable(void)
 {
-    int i;
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
-                                       | DISP_CTRL1_DTE | DISP_CTRL1_D(2)));
-    mdelay(5);
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, DISP_CTRL1_D(1));
-    mdelay(5);
-    SLCD_SEND_COMMAND(REG_DISP_CTRL1, DISP_CTRL1_D(0));
-    mdelay(5);
-    SLCD_SEND_COMMAND(REG_PWR_CTRL1, PWR_CTRL1_SLP);
+    __slcd_display_off();
 }
+
 void lcd_ctrl_init(void *lcdbase)
 {
     _display_pin_init();
@@ -360,14 +377,5 @@ void lcd_ctrl_init(void *lcdbase)
 
     jz_slcd_desc_init(lcdbase, &panel_info);
     __slcd_display_on();
-}
-
-void lcd_enable(void)
-{
-    __slcd_display_on();
-}
-void lcd_disable(void)
-{
-    __slcd_display_off();
 }
 
