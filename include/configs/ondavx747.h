@@ -62,9 +62,8 @@
 				 CFG_CMD_ASKENV | \
                                  CFG_CMD_NAND   | \
 				 CFG_CMD_MMC    | \
-                                 CFG_CMD_FAT    | \
-				 CFG_CMD_DHCP	| \
-				 CFG_CMD_PING   )
+                                 CFG_CMD_FAT \
+				 				)
 
 #define CONFIG_BOOTP_MASK	( CONFIG_BOOTP_DEFAUL )
 
@@ -77,13 +76,10 @@
 #define CONFIG_BOOTCOMMAND	"nand read 0x80600000 0x400000 0x300000;bootm"
 #define CFG_AUTOLOAD		"n"		/* No autoload */
 
-//#define CONFIG_NET_MULTI
-
-#define CONFIG_DRIVER_CS8900      1
-#define CS8900_BASE             (0xa8000000)
-#define CS8900_BUS16
-
-#define CONFIG_ETHADDR		00:2a:cc:2a:af:fe    /* Ethernet address */
+/*uninclude net support to save space*/
+#ifdef CFG_CMD_NET
+#undef CFG_CMD_NET
+#endif
 
 /*
  * Serial download configuration
