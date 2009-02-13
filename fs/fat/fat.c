@@ -83,7 +83,9 @@ fat_register_device(block_dev_desc_t *dev_desc, int part_no)
 		/* no signature found */
 		return -1;
 	}
-	if (buffer[450] != 11 && buffer[450] != 6 )
+	/*A partition type of 0xC is a FAT32 partition that uses Logical Block Addressing (LBA). 
+		A partition type of 0xE is a FAT16 partition that uses LBA */
+	if (buffer[450] != 11 && buffer[450] != 6 && buffer[450]!=12 && buffer[450]!=14)
 		printf("I'm sorry wo only surport fat16 and fat32\n");
 
 	if(!strncmp((char *)&buffer[DOS_FS_TYPE_OFFSET],"FAT",3)) {
