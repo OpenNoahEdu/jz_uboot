@@ -63,9 +63,10 @@ short console_row;
  /************************************************************************/
 
 void lcd_ctrl_init(void *lcdbase);
-
 void lcd_enable(void);
 void lcd_disable(void);
+void jz_slcd_update(void);
+extern void flush_cache_all(void);
 
 vidinfo_t panel_info = {
 #if defined(CONFIG_JZSLCD_TFT_G240400RTSW_3WTP_E)
@@ -83,7 +84,7 @@ do {                                    \
 
 static void _display_pin_init(void)
 {
-    int i;
+    
     my__gpio_as_lcd_16bit();
     __gpio_as_output(PIN_CS_N);
     __gpio_as_output(PIN_RESET_N);
@@ -127,7 +128,6 @@ static void _set_slcd_clock(void)
 
 static void _display_init(void)
 {
-    int i;
 
     SLCD_SEND_COMMAND(REG_SOFT_RESET, SOFT_RESET(1));
     mdelay(2);
@@ -251,7 +251,7 @@ void lcd_set_target(short x, short y, short width, short height)
 
 static void __slcd_display_on(void)
 {
-    int i;
+    
     SLCD_SEND_COMMAND(REG_PWR_CTRL1,
                       (PWR_CTRL1_SAPE | PWR_CTRL1_BT(6) | PWR_CTRL1_APE |
                        PWR_CTRL1_AP(3)));
@@ -265,7 +265,7 @@ static void __slcd_display_on(void)
 }
 static void __slcd_display_off(void)
 {
-    int i;
+    
     SLCD_SEND_COMMAND(REG_DISP_CTRL1, (DISP_CTRL1_VON | DISP_CTRL1_GON
                                        | DISP_CTRL1_DTE | DISP_CTRL1_D(2)));
     mdelay(5);
@@ -296,7 +296,7 @@ unsigned int desc_phys_addr;
 
 void jz_slcd_update()
 {
-    char buff[256];
+   
     desc->dcmd =
         DMAC_DCMD_SAI | DMAC_DCMD_RDIL_IGN | DMAC_DCMD_SWDH_32 |
         DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BIT | DMAC_DCMD_TM | DMAC_DCMD_DES_V
@@ -338,9 +338,6 @@ void jz_slcd_update()
 
 static void jz_slcd_desc_init(void *lcdbase, vidinfo_t * vid)
 {
-
-    char buff[256];
-
 
     dma_src_addr = (unsigned int) lcdbase;
     dma_dst_addr = SLCD_FIFO;

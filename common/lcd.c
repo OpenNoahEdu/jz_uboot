@@ -83,6 +83,8 @@ static void *lcd_logo (void);
 
 #ifdef CONFIG_JzRISC		  /* JzRISC core */ 
 extern int flush_cache_all(void);
+extern void jz_slcd_update(void);
+void lcd_set_target(short x, short y, short width, short height);
 #endif
 
 #if LCD_BPP == LCD_COLOR8
