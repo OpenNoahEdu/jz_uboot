@@ -216,7 +216,7 @@
  * GPIO definition
  */
 #define GPIO_SD_VCC_EN_N	113 /* GPD17 */
-#define GPIO_SD_CD_N		110 /* GPD14 */
+#define GPIO_SD_CD_N		61 /* GPB29 */
 #define GPIO_SD_WP		112 /* GPD16 */
 #define GPIO_USB_DETE		102 /* GPD6 */
 #define GPIO_DC_DETE_N		103 /* GPD7 */
