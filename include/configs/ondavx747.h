@@ -123,8 +123,8 @@
 /*-----------------------------------------------------------------------
  * NAND FLASH configuration
  */
-#define CFG_MAX_NAND_DEVICE     1
-#define NAND_MAX_CHIPS          1
+#define CFG_MAX_NAND_DEVICE     2
+#define NAND_MAX_CHIPS          2
 #define CFG_NAND_BASE           0xB8000000
 #define CFG_NAND_SELECT_DEVICE  1       /* nand driver supports mutipl. chips   */
 
