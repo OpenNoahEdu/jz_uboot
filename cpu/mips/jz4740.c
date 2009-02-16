@@ -30,7 +30,43 @@
 #include <asm/jz4740.h>
 
 extern void board_early_init(void);
+void pll_init(void)
+{
+    register unsigned int cfcr, plcr1;
+    int n2FR[33] = {
+        0, 0, 1, 2, 3, 0, 4, 0, 5, 0, 0, 0, 6, 0, 0, 0,
+        7, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0,
+        9
+    };
+    int div[5] = { 0, 3, 3, 3, 3 };     /* divisors of I:S:P:M:L */
+    int nf, pllout2;
 
+    cfcr = CPM_CPCCR_CLKOEN |
+        (n2FR[div[0]] << CPM_CPCCR_CDIV_BIT) |
+        (n2FR[div[1]] << CPM_CPCCR_HDIV_BIT) |
+        (n2FR[div[2]] << CPM_CPCCR_PDIV_BIT) |
+        (n2FR[div[3]] << CPM_CPCCR_MDIV_BIT) |
+        (n2FR[div[4]] << CPM_CPCCR_LDIV_BIT);
+
+    pllout2 = (cfcr & CPM_CPCCR_PCS) ? CFG_CPU_SPEED : (CFG_CPU_SPEED / 2);
+
+    /* Init USB Host clock, pllout2 must be n*48MHz */
+    REG_CPM_UHCCDR = pllout2 / 48000000 - 1;
+
+    nf = CFG_CPU_SPEED * 2 / CFG_EXTAL;
+    plcr1 = ((nf + 2) << CPM_CPPCR_PLLM_BIT) |  /* FD */
+        (0 << CPM_CPPCR_PLLN_BIT) |     /* RD=0, NR=2 */
+        (0 << CPM_CPPCR_PLLOD_BIT) |    /* OD=0, NO=1 */
+        (0x20 << CPM_CPPCR_PLLST_BIT) | /* PLL stable time */
+        CPM_CPPCR_PLLEN;        /* enable PLL */
+
+    /* init PLL */
+    REG_CPM_CPCCR = cfcr;
+    REG_CPM_CPPCR = plcr1;
+
+}
+
+#if 0
 /* PLL output clock = EXTAL * NF / (NR * NO)
  *
  * NF = FD + 2, NR = RD + 2
@@ -71,7 +107,7 @@ void pll_init(void)
 	REG_CPM_CPCCR = cfcr;
 	REG_CPM_CPPCR = plcr1;
 }
-
+#endif
 void pll_add_test(int new_freq)
 {
 	register unsigned int cfcr, plcr1;
