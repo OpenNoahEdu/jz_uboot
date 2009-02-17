@@ -72,7 +72,7 @@
 
 #define CONFIG_BOOTDELAY	3
 #define CONFIG_BOOTFILE	        "uImage"	/* file to load */
-#define CONFIG_BOOTARGS		"mem=64M console=ttyS0,57600n8 ip=off rootfstype=yaffs2 root=/dev/mtdblock2 rw"
+#define CONFIG_BOOTARGS		"mem=16M console=ttyS0,57600n8 ip=off rootfstype=yaffs2 root=/dev/mtdblock2 rw"
 //#define CONFIG_BOOTCOMMAND	"mmcinit;fatload mmc 0 0x80600000 uImage;bootm"
 /*for put u-boot into nand flash automaticlly*/
 #define CONFIG_BOOTCOMMAND      "mmcinit;fatload mmc 0 0x80600000 u-boot-nand.bin;nand unlock;nand erase 0x0 0x80000;nand write 0x80600000 0x0 0x80000;nand erase 0x100000 0x80000;setenv bootcmd 'mmcinit;fatload mmc 0 0x80600000 uImage;bootm';saveenv;reset\0"
