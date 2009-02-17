@@ -31,7 +31,7 @@
 #define CONFIG_JZ4740		1  /* Jz4740 SoC */
 #define CONFIG_ONDAVX747		1  /* PAVO validation board */
 
-#define CONFIG_LCD        /*SLCD Support*/
+//#define CONFIG_LCD        /*SLCD Support*/
 
 #define CONFIG_JZSLCD
 #define CONFIG_JZSLCD_TFT_G240400RTSW_3WTP_E
@@ -73,7 +73,9 @@
 #define CONFIG_BOOTDELAY	3
 #define CONFIG_BOOTFILE	        "uImage"	/* file to load */
 #define CONFIG_BOOTARGS		"mem=64M console=ttyS0,57600n8 ip=off rootfstype=yaffs2 root=/dev/mtdblock2 rw"
-#define CONFIG_BOOTCOMMAND	"nand read 0x80600000 0x400000 0x300000;bootm"
+//#define CONFIG_BOOTCOMMAND	"mmcinit;fatload mmc 0 0x80600000 uImage;bootm"
+/*for put u-boot into nand flash automaticlly*/
+#define CONFIG_BOOTCOMMAND      "mmcinit;fatload mmc 0 0x80600000 u-boot-nand.bin;nand unlock;nand erase 0x0 0x80000;nand write 0x80600000 0x0 0x80000;nand erase 0x100000 0x80000;setenv bootcmd 'mmcinit;fatload mmc 0 0x80600000 uImage;bootm';saveenv;reset\0"
 #define CFG_AUTOLOAD		"n"		/* No autoload */
 
 /*uninclude net support to save space*/
