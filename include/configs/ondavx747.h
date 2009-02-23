@@ -41,7 +41,6 @@
 #define JZ4740_NORBOOT_CFG	JZ4740_NORBOOT_16BIT	/* NOR Boot config code */
 #define JZ4740_NANDBOOT_CFG	JZ4740_NANDBOOT_B8R3	/* NAND Boot config code */
 
-//#define CFG_CPU_SPEED		336000000	/* CPU clock: 336 MHz */
 #define CFG_CPU_SPEED           360000000
 #define CFG_EXTAL		12000000	/* EXTAL freq: 12 MHz */
 #define	CFG_HZ			(CFG_EXTAL/256) /* incrementer freq */
@@ -70,13 +69,17 @@
 /* this must be included AFTER the definition of CONFIG_COMMANDS (if any) */
 #include <cmd_confdefs.h>
 
-#define CONFIG_BOOTDELAY	3
+#define CONFIG_OMIT_ENV_NAND    
+#define CONFIG_BOOTDELAY	0
 #define CONFIG_BOOTFILE	        "uImage"	/* file to load */
-#define CONFIG_BOOTARGS		"mem=16M console=ttyS0,57600n8 ip=off rootfstype=yaffs2 root=/dev/mtdblock2 rw"
-//#define CONFIG_BOOTCOMMAND	"mmcinit;fatload mmc 0 0x80600000 uImage;bootm"
-/*for put u-boot into nand flash automaticlly*/
-#define CONFIG_BOOTCOMMAND      "mmcinit;fatload mmc 0 0x80600000 u-boot-nand.bin;nand unlock;nand erase 0x0 0x80000;nand write 0x80600000 0x0 0x80000;nand erase 0x100000 0x80000;setenv bootcmd 'mmcinit;fatload mmc 0 0x80600000 uImage;bootm';saveenv;reset\0"
-#define CFG_AUTOLOAD		"n"		/* No autoload */
+
+#define CONFIG_SAVE_UBOOT       "mmcinit;fatload mmc 0 0x80600000 u-boot-nand.bin;nand unlock;nand erase 0x0 0x80000;nand write 0x80600000 0x0 0x80000;reset\0"
+#define CONFIG_BOOT_LINUX       "mmcinit;fatload mmc 0 0x80600000 uImage;bootm\0"
+//#define CONFIG_BOOTCOMMAND      CONFIG_SAVE_UBOOT
+#define CONFIG_BOOTCOMMAND      CONFIG_BOOT_LINUX
+#define CONFIG_BOOTARGS		"mem=16M console=ttyS0,57600n8 ip=off rootfstype=ext2 root=/dev/mmcblk0p2 rw rootdelay=1 nohz=off"
+
+#define CFG_AUTOLOAD		"y"		/* No autoload */
 
 /*uninclude net support to save space*/
 #ifdef CFG_CMD_NET
