@@ -31,8 +31,7 @@
 #define CONFIG_JZ4740		1  /* Jz4740 SoC */
 #define CONFIG_ONDAVX747		1  /* PAVO validation board */
 
-//#define CONFIG_LCD        /*SLCD Support*/
-
+#define CONFIG_LCD        /*SLCD Support*/
 #define CONFIG_JZSLCD
 #define CONFIG_JZSLCD_TFT_G240400RTSW_3WTP_E
 #define LCD_BPP			4  /* 4: 16 bits per pixel */
@@ -42,7 +41,8 @@
 #define JZ4740_NORBOOT_CFG	JZ4740_NORBOOT_16BIT	/* NOR Boot config code */
 #define JZ4740_NANDBOOT_CFG	JZ4740_NANDBOOT_B8R3	/* NAND Boot config code */
 
-#define CFG_CPU_SPEED		336000000	/* CPU clock: 336 MHz */
+//#define CFG_CPU_SPEED		336000000	/* CPU clock: 336 MHz */
+#define CFG_CPU_SPEED           360000000
 #define CFG_EXTAL		12000000	/* EXTAL freq: 12 MHz */
 #define	CFG_HZ			(CFG_EXTAL/256) /* incrementer freq */
 
@@ -125,8 +125,8 @@
 /*-----------------------------------------------------------------------
  * NAND FLASH configuration
  */
-#define CFG_MAX_NAND_DEVICE     2
-#define NAND_MAX_CHIPS          2
+#define CFG_MAX_NAND_DEVICE     1
+#define NAND_MAX_CHIPS          1
 #define CFG_NAND_BASE           0xB8000000
 #define CFG_NAND_SELECT_DEVICE  1       /* nand driver supports mutipl. chips   */
 

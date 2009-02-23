@@ -30,6 +30,7 @@
 #include <asm/jz4740.h>
 
 extern void board_early_init(void);
+#if 0
 void pll_init(void)
 {
     register unsigned int cfcr, plcr1;
@@ -54,7 +55,7 @@ void pll_init(void)
     REG_CPM_UHCCDR = pllout2 / 48000000 - 1;
 
     nf = CFG_CPU_SPEED * 2 / CFG_EXTAL;
-    plcr1 = ((nf + 2) << CPM_CPPCR_PLLM_BIT) |  /* FD */
+    plcr1 = ((nf - 2) << CPM_CPPCR_PLLM_BIT) |  /* FD */
         (0 << CPM_CPPCR_PLLN_BIT) |     /* RD=0, NR=2 */
         (0 << CPM_CPPCR_PLLOD_BIT) |    /* OD=0, NO=1 */
         (0x20 << CPM_CPPCR_PLLST_BIT) | /* PLL stable time */
@@ -65,8 +66,8 @@ void pll_init(void)
     REG_CPM_CPPCR = plcr1;
 
 }
+#endif
 
-#if 0
 /* PLL output clock = EXTAL * NF / (NR * NO)
  *
  * NF = FD + 2, NR = RD + 2
@@ -107,7 +108,7 @@ void pll_init(void)
 	REG_CPM_CPCCR = cfcr;
 	REG_CPM_CPPCR = plcr1;
 }
-#endif
+
 void pll_add_test(int new_freq)
 {
 	register unsigned int cfcr, plcr1;
