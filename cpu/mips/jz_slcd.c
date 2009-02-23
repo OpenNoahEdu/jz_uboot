@@ -42,8 +42,6 @@
 #include "jz_lcd.h"
 #include "jz_slcd.h"
 
-
-
 #define SLCD_DMA_CHAN             0
 
 int lcd_line_length;
@@ -68,9 +66,18 @@ void lcd_disable(void);
 void jz_slcd_update(void);
 extern void flush_cache_all(void);
 
+#define ORI_HORIZONTAL           1
+#define ORI_VERTICAL               2
+
+#define DISPLAY_ORI           ORI_VERTICAL
+
 vidinfo_t panel_info = {
 #if defined(CONFIG_JZSLCD_TFT_G240400RTSW_3WTP_E)
-    240, 400, 4,
+#if DISPLAY_ORI == ORI_VERTICAL
+    240, 400, 4, 
+ #else
+ 	400, 240, 4,
+#endif
 #endif
 };
 
@@ -125,7 +132,6 @@ static void _set_slcd_clock(void)
     __cpm_set_pixdiv(val);
     __cpm_start_lcd();
 }
-
 static void _display_init(void)
 {
 
@@ -137,15 +143,17 @@ static void _display_init(void)
 
     SLCD_SEND_COMMAND(REG_DRIVER_OUTPUT, 0x100);
     SLCD_SEND_COMMAND(REG_LCD_DR_WAVE_CTRL, 0x100);
-#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-    SLCD_SEND_COMMAND(REG_ENTRY_MODE,
+
+#if DISPLAY_ORI == ORI_VERTICAL
+	SLCD_SEND_COMMAND(REG_ENTRY_MODE,
                       (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_HID |
                        ENTRY_MODE_HWM));
 #else
-    SLCD_SEND_COMMAND(REG_ENTRY_MODE,
+   SLCD_SEND_COMMAND(REG_ENTRY_MODE,
                       (ENTRY_MODE_BGR | ENTRY_MODE_VID | ENTRY_MODE_AM |
                       ENTRY_MODE_HWM));
 #endif
+
     SLCD_SEND_COMMAND(REG_DISP_CTRL2, 0x503);
     SLCD_SEND_COMMAND(REG_DISP_CTRL3, 1);
     SLCD_SEND_COMMAND(REG_LPCTRL, 0x10);
@@ -169,17 +177,12 @@ static void _display_init(void)
     SLCD_SEND_COMMAND(REG_PWR_CTRL6, 1);
     SLCD_SEND_COMMAND(REG_RAM_HADDR_SET, 0);    /* set cursor at x_start */
     SLCD_SEND_COMMAND(REG_RAM_VADDR_SET, 0);    /* set cursor at y_start */
-#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
+
     SLCD_SEND_COMMAND(REG_RAM_HADDR_START, 0);  /* y_start */
     SLCD_SEND_COMMAND(REG_RAM_HADDR_END, 239);  /* y_end */
     SLCD_SEND_COMMAND(REG_RAM_VADDR_START, 0);  /* x_start */
     SLCD_SEND_COMMAND(REG_RAM_VADDR_END, 399);  /* x_end */
-#else
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_START, 0);  /* y_start */
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_END, 399);  /* y_end */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_START, 0);  /* x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_END, 239);  /* x_end */
-#endif
+
     SLCD_SEND_COMMAND(REG_RW_NVM, 0);
     SLCD_SEND_COMMAND(REG_VCOM_HVOLTAGE1, 6);
     SLCD_SEND_COMMAND(REG_VCOM_HVOLTAGE2, 0);
@@ -231,22 +234,10 @@ static void _display_init(void)
     mdelay(5);
 }
 
-void lcd_set_target(short x, short y, short width, short height)
+
+void write_frame()
 {
-#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_START, y);  /* y_start */
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_END, y + width - 1);        /* y_end */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_START, x);  /* x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_END, x + height - 1);       /* x_end */
-#else
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_START, y);  /* y_start */
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_END, y + height - 1);       /* y_end */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_START, x);  /* x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_END, x + width - 1);        /* x_end */
-#endif
-    SLCD_SEND_COMMAND(REG_RAM_HADDR_SET, y);    /* set cursor at x_start */
-    SLCD_SEND_COMMAND(REG_RAM_VADDR_SET, x);    /* set cursor at y_start */
-    SLCD_SET_COMMAND(REG_RW_GRAM);      /* write data to GRAM */
+	SLCD_SET_COMMAND(REG_RW_GRAM); 
 }
 
 static void __slcd_display_on(void)
@@ -296,11 +287,40 @@ unsigned int desc_phys_addr;
 
 void jz_slcd_update()
 {
-   
-    desc->dcmd =
+
+    /* DMA doorbell set -- start DMA now ... */
+    REG_DMAC_DMADBSR = 1 << SLCD_DMA_CHAN;
+//#if 0
+    while (1)
+    {
+        if (REG_DMAC_DCCSR((SLCD_DMA_CHAN)) & DMAC_DCCSR_TT)
+        {
+            REG_DMAC_DCCSR(SLCD_DMA_CHAN) &= ~DMAC_DCCSR_TT;
+            break;
+        }
+    }
+//#endif
+}
+
+static void jz_slcd_desc_init(void *lcdbase, vidinfo_t * vid)
+{
+
+    dma_src_addr = (unsigned int) lcdbase;
+    dma_dst_addr = SLCD_FIFO;
+    dma_src_phys_addr = virt_to_phys((void *) dma_src_addr);
+    dma_dst_phys_addr = virt_to_phys((void *) dma_dst_addr);
+
+    desc =
+        (struct jz_dma_desc *) ((u_long) lcdbase +
+                                vid->vl_row * (vid->vl_col *
+                                               NBITS(vid->vl_bpix)) / 8);
+    desc_phys_addr = virt_to_phys((void *) desc);
+
+
+   desc->dcmd =
         DMAC_DCMD_SAI | DMAC_DCMD_RDIL_IGN | DMAC_DCMD_SWDH_32 |
-        DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BIT | DMAC_DCMD_TM | DMAC_DCMD_DES_V
-        | DMAC_DCMD_DES_VM | DMAC_DCMD_DES_VIE | DMAC_DCMD_TIE;
+        DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BIT |  DMAC_DCMD_DES_V
+        |  DMAC_DCMD_DES_VIE | DMAC_DCMD_TIE;
     desc->dsadr = dma_src_phys_addr;    /* DMA source address */
     desc->dtadr = dma_dst_phys_addr;    /* DMA target address */
     desc->ddadr = panel_info.vl_col * panel_info.vl_row;
@@ -336,22 +356,6 @@ void jz_slcd_update()
 
 }
 
-static void jz_slcd_desc_init(void *lcdbase, vidinfo_t * vid)
-{
-
-    dma_src_addr = (unsigned int) lcdbase;
-    dma_dst_addr = SLCD_FIFO;
-    dma_src_phys_addr = virt_to_phys((void *) dma_src_addr);
-    dma_dst_phys_addr = virt_to_phys((void *) dma_dst_addr);
-
-    desc =
-        (struct jz_dma_desc *) ((u_long) lcdbase +
-                                vid->vl_row * (vid->vl_col *
-                                               NBITS(vid->vl_bpix)) / 8);
-    desc_phys_addr = virt_to_phys((void *) desc);
-
-}
-
 void lcd_enable(void)
 {
     __slcd_display_on();
@@ -370,9 +374,11 @@ void lcd_ctrl_init(void *lcdbase)
     mdelay(1);
     _display_init();
     __cpm_start_lcd();
-    lcd_set_target(0, 0, panel_info.vl_col, panel_info.vl_row);
 
     jz_slcd_desc_init(lcdbase, &panel_info);
     __slcd_display_on();
+       
 }
+
+
 

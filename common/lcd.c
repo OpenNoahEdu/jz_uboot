@@ -84,7 +84,7 @@ static void *lcd_logo (void);
 #ifdef CONFIG_JzRISC		  /* JzRISC core */ 
 extern int flush_cache_all(void);
 extern void jz_slcd_update(void);
-void lcd_set_target(short x, short y, short width, short height);
+extern void write_frame();
 #endif
 
 #if LCD_BPP == LCD_COLOR8
@@ -299,8 +299,10 @@ static void lcd_drawchars (ushort x, ushort y, uchar *str, int count)
 	}
 	
 #ifdef CONFIG_JZSLCD
-	lcd_set_target(0,0,panel_info.vl_col,panel_info.vl_row);
+	//lcd_set_target(100,100,panel_info.vl_col,panel_info.vl_row);
+	write_frame();
 	jz_slcd_update();
+
 #endif
 #ifdef CONFIG_JzRISC		  /* JzRISC core */ 
 	flush_cache_all();
