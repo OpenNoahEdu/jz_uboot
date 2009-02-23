@@ -101,7 +101,7 @@ uchar env_get_char_spec (int index)
  */
 int env_init(void)
 {
-#if defined(ENV_IS_EMBEDDED)
+#if (defined(ENV_IS_EMBEDDED) && (!defined(CONFIG_OMIT_ENV_NAND)))
 	ulong total;
 	int crc1_ok = 0, crc2_ok = 0;
 	env_t *tmp_env1, *tmp_env2;
@@ -139,8 +139,12 @@ int env_init(void)
 	else if (gd->env_valid == 2)
 		env_ptr = tmp_env2;
 #else /* ENV_IS_EMBEDDED */
+   printf("useing defalut \n");
 	gd->env_addr  = (ulong)&default_environment[0];
 	gd->env_valid = 1;
+	#if defined(CONFIG_OMIT_ENV_NAND)
+	gd->env_valid = 0;
+	#endif
 #endif /* ENV_IS_EMBEDDED */
 
 	return (0);
