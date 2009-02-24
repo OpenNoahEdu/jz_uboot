@@ -70,14 +70,14 @@
 #include <cmd_confdefs.h>
 
 #define CONFIG_OMIT_ENV_NAND    
-#define CONFIG_BOOTDELAY	0
+#define CONFIG_BOOTDELAY	3
 #define CONFIG_BOOTFILE	        "uImage"	/* file to load */
 
 #define CONFIG_SAVE_UBOOT       "mmcinit;fatload mmc 0 0x80600000 u-boot-nand.bin;nand unlock;nand erase 0x0 0x80000;nand write 0x80600000 0x0 0x80000;reset\0"
 #define CONFIG_BOOT_LINUX       "mmcinit;fatload mmc 0 0x80600000 uImage;bootm\0"
 //#define CONFIG_BOOTCOMMAND      CONFIG_SAVE_UBOOT
 #define CONFIG_BOOTCOMMAND      CONFIG_BOOT_LINUX
-#define CONFIG_BOOTARGS		"mem=16M console=ttyS0,57600n8 ip=off rootfstype=ext2 root=/dev/mmcblk0p2 rw rootdelay=1 nohz=off"
+#define CONFIG_BOOTARGS		"mem=16M console=tty0 console=ttyS0,57600n8 ip=off rootfstype=ext2 root=/dev/mmcblk0p2 rw rootdelay=1 nohz=off"
 
 #define CFG_AUTOLOAD		"y"		/* No autoload */
 
