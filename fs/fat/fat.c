@@ -243,7 +243,7 @@ get_fatent(fsdata *mydata, __u32 entry)
 	case 32:
 		offset *=4;
 		ret = (mydata->fatbuf[3 + offset]<<24) |(mydata->fatbuf[2 + offset]<<16) | (mydata->fatbuf[1 + offset]<< 8)| (mydata->fatbuf[0 + offset]);
-		ret = FAT2CPU32(((__u32*)mydata->fatbuf)[offset]);
+		//ret = FAT2CPU32(((__u32*)mydata->fatbuf)[offset]);
 		break;
 	case 16:
 		ret = FAT2CPU16(((__u16*)mydata->fatbuf)[offset]);
